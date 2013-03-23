@@ -293,8 +293,18 @@
   };
 
   var handshakeInit = function(data){
-    heartbeatInterval = data.sys.heartbeat;       // heartbeat interval
-    heartbeatTimeout = heartbeatInterval * 2;     // max heartbeat timeout
+    /**
+     * BUG Fixed: Server side pass the heartbeat in Second. but we need milliseconds
+     *            So multiply by 1000 this heartbeat value.
+     *            Also, in the code of server side, there is mistake spelling:
+     *            File `pomelolib/connectors/commands/heartbeat.js`,
+     *            Line 12:
+     *                this.hearbeat = null;
+     *            Should be:
+     *                this.heartbeat = null;
+     */
+    heartbeatInterval = data.sys.heartbeat * 1000;    // heartbeat interval
+    heartbeatTimeout = heartbeatInterval * 2;         // max heartbeat timeout
 
     initData(data);
 
