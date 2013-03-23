@@ -1651,8 +1651,18 @@ require.register("pomelonode-pomelo-jsclient-socket/lib/pomelo-client.js", funct
   };
 
   var handshakeInit = function(data){
-    heartbeatInterval = data.sys.heartbeat;       // heartbeat interval
-    heartbeatTimeout = heartbeatInterval * 2;     // max heartbeat timeout
+    /**
+     * BUG Fixed: Server side pass the heartbeat in Second. but we need milliseconds
+     *            So multiply by 1000 this heartbeat value.
+     *            Also, in the code of server side, there is mistake spelling:
+     *            File `pomelolib/connectors/commands/heartbeat.js`,
+     *            Line 12:
+     *                this.hearbeat = null;
+     *            Should be:
+     *                this.heartbeat = null;
+     */
+    heartbeatInterval = data.sys.heartbeat * 1000;    // heartbeat interval
+    heartbeatTimeout = heartbeatInterval * 2;         // max heartbeat timeout
 
     initData(data);
 
@@ -5340,7 +5350,7 @@ if ( !jQuery.support.submitBubbles ) {
 			});
 			// return undefined since we don't need an event listener
 		},
-		
+
 		postDispatch: function( event ) {
 			// If form was submitted by the user, bubble the event up the tree
 			if ( event._submit_bubble ) {
@@ -11105,10 +11115,10 @@ require.register("boot/index.js", function(exports, require, module){
 
   var protocol = require('pomelo-protocol');
   window.Protocol = protocol;
-  
+
   var protobuf = require('pomelo-protobuf');
   window.protobuf = protobuf;
-  
+
   var pomelo = require('pomelo-jsclient-socket');
   window.pomelo = pomelo;
 
