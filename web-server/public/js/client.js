@@ -162,6 +162,7 @@ function queryEntry(uid, callback) {
 	pomelo.init({
 		host: window.location.hostname,
 		port: 3014,
+		encrypt: true,
 		log: true
 	}, function() {
 		pomelo.request(route, {
@@ -229,6 +230,7 @@ $(document).ready(function() {
 			pomelo.init({
 				host: host,
 				port: port,
+				encrypt: true,
 				log: true
 			}, function() {
 				var route = "connector.entryHandler.enter";

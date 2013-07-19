@@ -1,0 +1,19 @@
+{
+  "name": "pomelo-rsasign",
+  "description": "js rsa signature for pomelo",
+  "keywords": [
+    "pomelo",
+    "rsa",
+    "signature"
+  ],
+  "version": "0.0.1",
+  "main": "lib/rsa.js",
+  "scripts": [
+    "lib/b64.js",
+    "lib/jsbn.js",
+    "lib/rsa.js",
+    "lib/asn1hex-1.1.js",
+    "lib/rng.js"
+  ],
+  "repo": "https://github.com/pomelonode/pomelo-rsasign"
+}

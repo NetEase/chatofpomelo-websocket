@@ -13,7 +13,8 @@ app.configure('production|development', 'connector', function(){
 			connector : pomelo.connectors.hybridconnector,
 			heartbeat : 3,
 			useDict : true,
-			useProtobuf : true
+			useProtobuf : true,
+			useCrypto: true
 		});
 });
 

@@ -126,7 +126,6 @@
     return n;
   };
 
-
   Codec.decodeSInt32 = function(bytes){
     var n = this.decodeUInt32(bytes);
     var flag = ((n%2) === 1)?-1:1;
@@ -142,7 +141,7 @@
   };
 
   Codec.decodeFloat = function(bytes, offset){
-    if(!bytes || bytes.length < (offset +4)){
+    if(!bytes || bytes.length < (offset + 4)){
       return null;
     }
 
@@ -159,7 +158,7 @@
   };
 
   Codec.decodeDouble = function(bytes, offset){
-    if(!bytes || bytes.length < (8 + offset)){
+    if(!bytes || bytes.length < (offset + 8)){
       return null;
     }
 
