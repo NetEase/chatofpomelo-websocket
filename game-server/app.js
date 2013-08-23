@@ -22,6 +22,7 @@ app.configure('production|development', 'gate', function(){
 	app.set('connectorConfig',
 		{
 			connector : pomelo.connectors.hybridconnector,
+			useProtobuf : true
 		});
 });
 
