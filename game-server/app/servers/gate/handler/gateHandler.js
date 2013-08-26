@@ -15,7 +15,7 @@ var handler = Handler.prototype;
  *
  * @param {Object} msg message from client
  * @param {Object} session
- * @param {Function} next next stemp callback
+ * @param {Function} next next step callback
  *
  */
 handler.queryEntry = function(msg, session, next) {
@@ -34,7 +34,7 @@ handler.queryEntry = function(msg, session, next) {
 		});
 		return;
 	}
-	// select connector
+	// select connector, because more than one connector existed.
 	var res = dispatcher.dispatch(uid, connectors);
 	next(null, {
 		code: 200,
