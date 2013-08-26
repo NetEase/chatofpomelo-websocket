@@ -28,7 +28,10 @@ app.configure('production|development', 'connector', function(){
 	app.set('connectorConfig',
 		{
 			connector : pomelo.connectors.hybridconnector,
-			heartbeat : 3
+			heartbeat : 3,
+     
+      // enable useDict will make route to be compressed 
+      useDict: true
 		});
 });
 
@@ -36,7 +39,7 @@ app.configure('production|development', 'gate', function(){
 	app.set('connectorConfig',
 		{
 			connector : pomelo.connectors.hybridconnector,
-			useProtobuf : true
+			useDict: true
 		});
 });
 
