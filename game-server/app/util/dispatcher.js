@@ -1,6 +1,7 @@
 var crc = require('crc');
 
-module.exports.dispatch = function(uid, connectors) {
-	var index = Math.abs(crc.crc32(uid)) % connectors.length;
-	return connectors[index];
+// select an item from list based on key
+module.exports.dispatch = function(key, list) {
+	var index = Math.abs(crc.crc32(key)) % list.length;
+	return list[index];
 };
