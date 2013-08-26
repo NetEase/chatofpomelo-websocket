@@ -1,5 +1,6 @@
 var pomelo = require('pomelo');
 var dispatcher = require('./app/util/dispatcher');
+var abuseFilter = require('./app/servers/chat/filter/abuseFilter');
 
 // route definition for chat server
 var chatRoute = function(session, msg, app, cb) {
@@ -27,7 +28,7 @@ app.configure('production|development', 'connector', function(){
 	app.set('connectorConfig',
 		{
 			connector : pomelo.connectors.hybridconnector,
-			heartbeat : 3,
+			heartbeat : 3
 		});
 });
 
@@ -35,7 +36,6 @@ app.configure('production|development', 'gate', function(){
 	app.set('connectorConfig',
 		{
 			connector : pomelo.connectors.hybridconnector,
-			useProtobuf : true
 		});
 });
 
@@ -43,9 +43,11 @@ app.configure('production|development', 'gate', function(){
 app.configure('production|development', function() {
 	// route configures
 	app.route('chat', chatRoute);
+  app.filter(pomelo.timeout());
+});
 
-	// filter configures
-	app.filter(pomelo.timeout());
+app.configure('production|development', 'chat', function() {
+  app.filter(abuseFilter());
 });
 
 // start app
