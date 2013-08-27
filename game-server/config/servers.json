@@ -12,7 +12,13 @@
         ],
         "gate":[
 	       {"id": "gate-server-1", "host": "127.0.0.1", "clientPort": 3014, "frontend": true}
-	    ]
+	      ],
+
+        "time":[
+          {"id": "time-server-1", "host":"127.0.0.1", "port" : 7000},
+          {"id": "time-server-2", "host":"127.0.0.1", "port" : 7001}
+        ]
+
     },
     "production":{
            "connector":[
@@ -27,6 +33,11 @@
         ],
         "gate":[
            {"id": "gate-server-1", "host": "127.0.0.1", "clientPort": 3014, "frontend": true}
+        ],
+
+        "time":[
+          {"id": "time-server-1", "host":"127.0.0.1", "port" : 7000 },
+          {"id": "time-server-2", "host":"127.0.0.1", "port" : 7001 }
         ]
   }
 }

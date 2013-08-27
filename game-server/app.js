@@ -16,6 +16,12 @@ var chatRoute = function(session, msg, app, cb) {
 	cb(null, res.id);
 };
 
+// route for time server
+
+var timeRoute = function(routeParam, msg, app, cb) {
+  var timeServers = app.getServersByType('time');
+  cb(null, timeServers[routeParam % timeServers.length].id);
+}
 
 /**
  * Init app for client.
@@ -34,7 +40,7 @@ app.configure('production|development', 'connector', function(){
       useDict: true,
 
       // enable useProto
-      useProto: true 
+      useProtobuf: true 
 		});
 });
 
@@ -45,7 +51,7 @@ app.configure('production|development', 'gate', function(){
 			useDict: true,
 
       // enable useProto
-      useProto: true
+      useProtobuf: true
 		});
 });
 
@@ -53,6 +59,7 @@ app.configure('production|development', 'gate', function(){
 app.configure('production|development', function() {
 	// route configures
 	app.route('chat', chatRoute);
+  app.route('time', timeRoute);
   app.filter(pomelo.timeout());
 });
 
