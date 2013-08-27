@@ -6,6 +6,7 @@
   var Package = Protocol.Package;
   var Message = Protocol.Message;
   var EventEmitter = window.EventEmitter;
+  var rsa = window.rsa;
 
   var RES_OK = 200;
   var RES_FAIL = 500;
@@ -28,6 +29,11 @@
   var handlers = {};
   //Map from request id to route
   var routeMap = {};
+  var dict = {};    // route string to code
+  var abbrs = {};   // code to route string
+  var serverProtos = {};
+  var clientProtos = {};
+  var protoVersion = 0;
 
   var heartbeatInterval = 0;
   var heartbeatTimeout = 0;
@@ -38,10 +44,16 @@
 
   var handshakeCallback = null;
 
+  var decod = null;
+  var encode = null;
+
+  var useCrypto;
+
   var handshakeBuffer = {
     'sys': {
       type: JS_WS_CLIENT_TYPE,
-      version: JS_WS_CLIENT_VERSION
+      version: JS_WS_CLIENT_VERSION,
+      rsa: {}
     },
     'user': {
     }
@@ -54,17 +66,78 @@
     var host = params.host;
     var port = params.port;
 
+    encode = params.encode || defaultEncode;
+    decode = params.decode || defaultDecode;
+
     var url = 'ws://' + host;
     if(port) {
       url +=  ':' + port;
     }
 
     handshakeBuffer.user = params.user;
+    if(params.encrypt) {
+      useCrypto = true;
+      rsa.generate(1024, "10001");
+      var data = {
+        rsa_n: rsa.n.toString(16),
+        rsa_e: rsa.e
+      }
+      handshakeBuffer.sys.rsa = data;
+    }
     handshakeCallback = params.handshakeCallback;
     initWebSocket(url, cb);
   };
 
-  var initWebSocket = function(url,cb){
+  var defaultDecode = pomelo.decode = function(data) {
+    //probuff decode
+    var msg = Message.decode(data);
+
+    if(msg.id > 0){
+      msg.route = routeMap[msg.id];
+      delete routeMap[msg.id];
+      if(!msg.route){
+        return;
+      }
+    }
+
+    msg.body = deCompose(msg);
+    return msg;
+  };
+
+  var defaultEncode = pomelo.encode = function(reqId, route, msg) {
+    var type = reqId ? Message.TYPE_REQUEST : Message.TYPE_NOTIFY;
+
+    //compress message by protobuf
+    if(clientProtos && clientProtos[route]) {
+      msg = protobuf.encode(route, msg);
+    } else {
+      msg = Protocol.strencode(JSON.stringify(msg));
+    }
+
+    var compressRoute = 0;
+    if(dict && dict[route]) {
+      route = dict[route];
+      compressRoute = 1;
+    }
+
+    return Message.encode(reqId, type, compressRoute, route, msg);
+  };
+
+  var initWebSocket = function(url,cb) {
+    console.log('connect to ' + url);
+    //Add protobuf version
+    if(window.localStorage && window.localStorage.getItem('protos') && protoVersion === 0){
+      var protos = JSON.parse(window.localStorage.getItem('protos'));
+
+      protoVersion = protos.version || 0;
+      serverProtos = protos.server || {};
+      clientProtos = protos.client || {};
+
+      if(protobuf) protobuf.init({encoderProtos: clientProtos, decoderProtos: serverProtos});
+    }
+    //Set protoversion
+    handshakeBuffer.sys.protoVersion = protoVersion;
+
     var onopen = function(event){
       var obj = Package.encode(Package.TYPE_HANDSHAKE, Protocol.strencode(JSON.stringify(handshakeBuffer)));
       send(obj);
@@ -135,24 +208,17 @@
   };
 
   var sendMessage = function(reqId, route, msg) {
-    var type = reqId ? Message.TYPE_REQUEST : Message.TYPE_NOTIFY;
-
-    //compress message by protobuf
-    var protos = !!pomelo.data.protos?pomelo.data.protos.client:{};
-    if(!!protos[route]){
-      msg = protobuf.encode(route, msg);
-    }else{
-      msg = Protocol.strencode(JSON.stringify(msg));
+    if(useCrypto) {
+      msg = JSON.stringify(msg);
+      var sig = rsa.signString(msg, "sha256");
+      msg = JSON.parse(msg);
+      msg['__crypto__'] = sig;
     }
 
-
-    var compressRoute = 0;
-    if(pomelo.dict && pomelo.dict[route]){
-      route = pomelo.dict[route];
-      compressRoute = 1;
+    if(encode) {
+      msg = encode(reqId, route, msg);
     }
 
-    msg = Message.encode(reqId, type, compressRoute, route, msg);
     var packet = Package.encode(Package.TYPE_DATA, msg);
     send(packet);
   };
@@ -160,7 +226,6 @@
   var send = function(packet){
     socket.send(packet.buffer);
   };
-
 
   var handler = {};
 
@@ -180,7 +245,6 @@
       // already in a heartbeat interval
       return;
     }
-
     heartbeatId = setTimeout(function() {
       heartbeatId = null;
       send(obj);
@@ -223,20 +287,11 @@
     }
   };
 
-  var onData = function(data){
-    //probuff decode
-    var msg = Message.decode(data);
-
-    if(msg.id > 0){
-      msg.route = routeMap[msg.id];
-      delete routeMap[msg.id];
-      if(!msg.route){
-        return;
-      }
+  var onData = function(data) {
+    var msg = data;
+    if(decode) {
+      msg = decode(msg);
     }
-
-    msg.body = deCompose(msg);
-
     processMessage(pomelo, msg);
   };
 
@@ -257,6 +312,7 @@
     if(!msg.id) {
       // server push message
       pomelo.emit(msg.route, msg.body);
+      return;
     }
 
     //if have a id then find the callback function with the request
@@ -278,8 +334,6 @@
   };
 
   var deCompose = function(msg){
-    var protos = !!pomelo.data.protos?pomelo.data.protos.server:{};
-    var abbrs = pomelo.data.abbrs;
     var route = msg.route;
 
     //Decompose route from dict
@@ -290,7 +344,7 @@
 
       route = msg.route = abbrs[route];
     }
-    if(!!protos[route]){
+    if(serverProtos && serverProtos[route]){
       return protobuf.decode(route, msg.body);
     }else{
       return JSON.parse(Protocol.strdecode(msg.body));
@@ -320,29 +374,30 @@
     if(!data || !data.sys) {
       return;
     }
-    pomelo.data = pomelo.data || {};
-    var dict = data.sys.dict;
+    dict = data.sys.dict;
     var protos = data.sys.protos;
 
     //Init compress dict
     if(dict){
-      pomelo.data.dict = dict;
-      pomelo.data.abbrs = {};
+      dict = dict;
+      abbrs = {};
 
       for(var route in dict){
-        pomelo.data.abbrs[dict[route]] = route;
+        abbrs[dict[route]] = route;
       }
     }
 
     //Init protobuf protos
     if(protos){
-      pomelo.data.protos = {
-        server : protos.server || {},
-        client : protos.client || {}
-      };
+      protoVersion = protos.version || 0;
+      serverProtos = protos.server || {};
+      clientProtos = protos.client || {};
       if(!!protobuf){
         protobuf.init({encoderProtos: protos.client, decoderProtos: protos.server});
       }
+
+      //Save protobuf protos to localStorage
+      window.localStorage.setItem('protos', JSON.stringify(protos));
     }
   };
 
