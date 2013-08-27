@@ -126,7 +126,6 @@
     return n;
   };
 
-
   Codec.decodeSInt32 = function(bytes){
     var n = this.decodeUInt32(bytes);
     var flag = ((n%2) === 1)?-1:1;
@@ -142,7 +141,7 @@
   };
 
   Codec.decodeFloat = function(bytes, offset){
-    if(!bytes || bytes.length < (offset +4)){
+    if(!bytes || bytes.length < (offset + 4)){
       return null;
     }
 
@@ -159,7 +158,7 @@
   };
 
   Codec.decodeDouble = function(bytes, offset){
-    if(!bytes || bytes.length < (8 + offset)){
+    if(!bytes || bytes.length < (offset + 8)){
       return null;
     }
 
@@ -319,20 +318,24 @@
       switch(proto.option){
         case 'required' :
           if(typeof(msg[name]) === 'undefined'){
+            console.warn('no property exist for required! name: %j, proto: %j, msg: %j', name, proto, msg);
             return false;
           }
         case 'optional' :
           if(typeof(msg[name]) !== 'undefined'){
-            if(!!protos.__messages[proto.type]){
-              checkMsg(msg[name], protos.__messages[proto.type]);
+            var message = protos.__messages[proto.type] || MsgEncoder.protos['message ' + proto.type];
+            if(!!message && !checkMsg(msg[name], message)){
+              console.warn('inner proto error! name: %j, proto: %j, msg: %j', name, proto, msg);
+              return false;
             }
           }
         break;
         case 'repeated' :
           //Check nest message in repeated elements
-          if(!!msg[name] && !!protos.__messages[proto.type]){
+          var message = protos.__messages[proto.type] || MsgEncoder.protos['message ' + proto.type];
+          if(!!msg[name] && !!message){
             for(var i = 0; i < msg[name].length; i++){
-              if(!checkMsg(msg[name][i], protos.__messages[proto.type])){
+              if(!checkMsg(msg[name][i], message)){
                 return false;
               }
             }
@@ -394,12 +397,13 @@
         offset += length;
       break;
       default :
-        if(!!protos.__messages[type]){
+        var message = protos.__messages[type] || MsgEncoder.protos['message ' + type];
+        if(!!message){
           //Use a tmp buffer to build an internal msg
-          var tmpBuffer = new ArrayBuffer(codec.byteLength(JSON.stringify(value)));
+          var tmpBuffer = new ArrayBuffer(codec.byteLength(JSON.stringify(value))*2);
           var length = 0;
 
-          length = encodeMsg(tmpBuffer, length, protos.__messages[type], value);
+          length = encodeMsg(tmpBuffer, length, message, value);
           //Encode length
           offset = writeBytes(buffer, offset, codec.encodeUInt32(length));
           //contact the object
@@ -446,6 +450,7 @@
 
   function encodeTag(type, tag){
     var value = constant.TYPES[type]||2;
+
     return codec.encodeUInt32((tag<<3)|value);
   }
 })('undefined' !== typeof protobuf ? protobuf : module.exports, this);
@@ -563,10 +568,11 @@
 
         return str;
       default :
-        if(!!protos && !!protos.__messages[type]){
+        var message = protos && (protos.__messages[type] || MsgDecoder.protos['message ' + type]);
+        if(!!message){
           var length = codec.decodeUInt32(getBytes());
           var msg = {};
-          decodeMsg(msg, protos.__messages[type], offset+length);
+          decodeMsg(msg, message, offset+length);
           return msg;
         }
       break;

@@ -34,7 +34,7 @@ app.configure('production|development', 'connector', function(){
       useDict: true,
 
       // enable useProto
-      useProto: true 
+      useProtobuf: true 
 		});
 });
 
@@ -45,7 +45,7 @@ app.configure('production|development', 'gate', function(){
 			useDict: true,
 
       // enable useProto
-      useProto: true
+      useProtobuf: true
 		});
 });
 
