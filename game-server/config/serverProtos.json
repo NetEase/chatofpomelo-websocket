@@ -1,0 +1,17 @@
+
+{
+  "onChat": {
+    "required string msg": 1,
+    "required string from": 2,
+    "required string target": 3
+  },
+
+  "onLeave": {
+    "required string user": 1
+  },
+
+  "onAdd": {
+    "required string user": 1
+  }
+}
+
