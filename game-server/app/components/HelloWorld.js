@@ -18,7 +18,7 @@ HelloWorld.prototype.start = function (cb) {
   var self = this;
   this.timerId = setInterval(function() {
     console.log(self.getServerId() + "Hello World!");
-    }, this.interval);
+   }, this.interval);
   process.nextTick(cb);
 }
 
