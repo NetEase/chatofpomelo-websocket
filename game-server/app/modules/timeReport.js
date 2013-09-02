@@ -12,6 +12,7 @@ var Module = function(opts) {
 }
 
 Module.prototype.monitorHandler = function(agent, msg, cb) {
+  console.log(this.app.getServerId() + msg);
   var serverId = agent.id;
   var time = new Date().toString();
 
@@ -20,7 +21,8 @@ Module.prototype.monitorHandler = function(agent, msg, cb) {
 
 Module.prototype.masterHandler = function(agent, msg) {
   if (!msg) {
-    agent.notifyAll(moduleId);
+    var testMsg = 'testmsg';
+    agent.notifyAll(moduleId, testMsg );
     return;
   }
 
