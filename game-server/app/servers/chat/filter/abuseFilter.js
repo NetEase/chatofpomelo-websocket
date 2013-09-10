@@ -19,6 +19,6 @@ Filter.prototype.after = function (err, msg, session, resp, next) {
     var user_info = session.uid.split('*');
     console.log('abuse:' + user_info[0] + " at room " + user_info[1]);
   }
-  next(err, resp);
+  next(err);
 };
 
