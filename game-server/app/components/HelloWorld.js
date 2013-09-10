@@ -28,7 +28,7 @@ HelloWorld.prototype.afterStart = function (cb) {
 }
 
 HelloWorld.prototype.stop = function (force, cb) {
-  cosole.log('Hello World stop');
+  console.log('Hello World stop');
   clearInterval(this.timerId);
   process.nextTick(cb);
 }
