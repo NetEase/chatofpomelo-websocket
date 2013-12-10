@@ -5,7 +5,8 @@ module.exports = function(app) {
 var ChatRemote = function(app) {
 	this.app = app;
 	this.channelService = app.get('channelService');
-};
+  var self = this;
+  };
 
 /**
  * Add user into chat channel.
@@ -23,7 +24,7 @@ ChatRemote.prototype.add = function(uid, sid, name, flag, cb) {
 		route: 'onAdd',
 		user: username
 	};
-	channel.pushMessage(param);
+	channel.pushMessage(param, {test: 'it is push'});
 
 	if( !! channel) {
 		channel.add(uid, sid);

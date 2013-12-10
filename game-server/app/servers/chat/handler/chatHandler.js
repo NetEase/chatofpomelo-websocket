@@ -6,6 +6,9 @@ module.exports = function(app) {
 
 var Handler = function(app) {
 	this.app = app;
+ setInterval(function() {
+app.channelService.broadcast('connector', 'onChat', {from: 'sys', target: '*', msg: 'xxxxxxxx' + ' i am ' + app.getServerId()}, {test: 'it is broadcast', binded: true}, function(){});}, 5000);
+
 };
 
 var handler = Handler.prototype;
@@ -44,5 +47,5 @@ handler.send = function(msg, session, next) {
 	}
 	next(null, {
 		route: msg.route
-	});
+	}, {test: 'test response'});
 };

@@ -296,7 +296,8 @@
   };
 
   var onKick = function(data) {
-    pomelo.emit('onKick');
+    data = JSON.parse(Protocol.strdecode(data));
+    pomelo.emit('onKick', data);
   };
 
   handlers[Package.TYPE_HANDSHAKE] = handshake;
@@ -304,8 +305,15 @@
   handlers[Package.TYPE_DATA] = onData;
   handlers[Package.TYPE_KICK] = onKick;
 
-  var processPackage = function(msg) {
-    handlers[msg.type](msg.body);
+  var processPackage = function(msgs) {
+    if(Array.isArray(msgs)) {
+      for(var i=0; i<msgs.length; i++) {
+        var msg = msgs[i];
+        handlers[msg.type](msg.body);
+      }
+    } else {
+      handlers[msgs.type](msgs.body);
+    }
   };
 
   var processMessage = function(pomelo, msg) {
