@@ -16,7 +16,6 @@ var chatRoute = function(session, msg, app, cb) {
 	cb(null, res.id);
 };
 
-
 /**
  * Init app for client.
  */
