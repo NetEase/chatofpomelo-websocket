@@ -24,7 +24,7 @@ ChatRemote.prototype.add = function(uid, sid, name, flag, cb) {
 		route: 'onAdd',
 		user: username
 	};
-	channel.pushMessage(param, {test: 'it is push'});
+	channel.pushMessage(param);
 
 	if( !! channel) {
 		channel.add(uid, sid);

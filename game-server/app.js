@@ -37,41 +37,6 @@ app.configure('production|development', 'connector', function(){
       // enable useProto
       useProtobuf: true 
 		}); 
- 
-  app.set('pushSchedulerConfig', {
-    scheduler: [
-      { id: 'direct',
-        scheduler: pomelo.pushSchedulers.direct
-      },
-      { id: 'buffer5',
-        scheduler: pomelo.pushSchedulers.buffer,
-        options: {flushInterval: 5000}
-      },
-
-      { id: 'buffer10',
-        scheduler: pomelo.pushSchedulers.buffer,
-        options: {flushInterval: 20000}
-      }
-   ],
-   selector: function(reqId, route, msg, recvs, opts, cb) {
-       console.log('xxxxargs', 'reqId:', reqId, ',route:', route, ',msg: ', msg, ',recvs: ', recvs, ',opts:', opts);
-     if(opts.type === 'push') {
-       console.log('it should be push', opts);
-       cb('buffer5');
-       return;
-     }
-     if (opts.type === 'response') {
-       console.log('it should be response', opts);
-       cb('direct');
-       return ;
-     }
-     if (opts.type === 'broadcast') {
-       console.log('it should be broadcast', opts);
-       cb('buffer10');
-       return ;
-     }
-   }
- });
 });
 
 app.configure('production|development', 'gate', function(){
