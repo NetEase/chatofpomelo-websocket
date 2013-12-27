@@ -129,6 +129,10 @@
   Package.decode = function(buffer){
     var offset = 0;
     var bytes = new ByteArray(buffer);
+<<<<<<< HEAD
+=======
+    var length = 0;
+>>>>>>> master
     var rs = [];
     while(offset < bytes.length) {
       var type = bytes[offset++];
@@ -343,4 +347,10 @@
   };
 
   module.exports = Protocol;
+<<<<<<< HEAD
+=======
+  if(typeof(window) != "undefined") {
+    window.Protocol = Protocol;
+  }
+>>>>>>> master
 })(typeof(window)=="undefined" ? module.exports : (this.Protocol = {}),typeof(window)=="undefined"  ? Buffer : Uint8Array, this);

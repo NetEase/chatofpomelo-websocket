@@ -494,6 +494,7 @@ require.register("NetEase-pomelo-protocol/lib/protocol.js", function(exports, re
   Package.decode = function(buffer){
     var offset = 0;
     var bytes = new ByteArray(buffer);
+    var length = 0;
     var rs = [];
     while(offset < bytes.length) {
       var type = bytes[offset++];
@@ -708,6 +709,9 @@ require.register("NetEase-pomelo-protocol/lib/protocol.js", function(exports, re
   };
 
   module.exports = Protocol;
+  if(typeof(window) != "undefined") {
+    window.Protocol = Protocol;
+  }
 })(typeof(window)=="undefined" ? module.exports : (this.Protocol = {}),typeof(window)=="undefined"  ? Buffer : Uint8Array, this);
 
 });
@@ -744,7 +748,11 @@ require.register("pomelonode-pomelo-protobuf/lib/client/protobuf.js", function(e
 
   // exports to support for components
   module.exports = Protobuf;
-})('object' === typeof module ? module.exports : (this.protobuf = {}), this);
+  if(typeof(window) != "undefined") {
+    window.protobuf = Protobuf;
+  }
+  
+})(typeof(window) == "undefined" ? module.exports : (this.protobuf = {}), this);
 
 /**
  * constants
@@ -1343,6 +1351,10 @@ require.register("pomelonode-pomelo-jsclient-websocket/lib/pomelo-client.js", fu
   var EventEmitter = window.EventEmitter;
   var rsa = window.rsa;
 
+  if(typeof(window) != "undefined" && typeof(sys) != 'undefined' && sys.localStorage) {
+    window.localStorage = sys.localStorage;
+  }
+  
   var RES_OK = 200;
   var RES_FAIL = 500;
   var RES_OLD_CLIENT = 501;
@@ -1379,7 +1391,7 @@ require.register("pomelonode-pomelo-jsclient-websocket/lib/pomelo-client.js", fu
 
   var handshakeCallback = null;
 
-  var decod = null;
+  var decode = null;
   var encode = null;
 
   var useCrypto;
@@ -1490,6 +1502,7 @@ require.register("pomelonode-pomelo-jsclient-websocket/lib/pomelo-client.js", fu
     };
     var onclose = function(event){
       pomelo.emit('close',event);
+      pomelo.emit('disconnect', event);
       console.error('socket close: ', event);
     };
     socket = new WebSocket(url);

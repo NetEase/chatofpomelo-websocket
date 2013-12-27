@@ -8,6 +8,10 @@
   var EventEmitter = window.EventEmitter;
   var rsa = window.rsa;
 
+  if(typeof(window) != "undefined" && typeof(sys) != 'undefined' && sys.localStorage) {
+    window.localStorage = sys.localStorage;
+  }
+  
   var RES_OK = 200;
   var RES_FAIL = 500;
   var RES_OLD_CLIENT = 501;
@@ -44,7 +48,7 @@
 
   var handshakeCallback = null;
 
-  var decod = null;
+  var decode = null;
   var encode = null;
 
   var useCrypto;
@@ -155,6 +159,7 @@
     };
     var onclose = function(event){
       pomelo.emit('close',event);
+      pomelo.emit('disconnect', event);
       console.error('socket close: ', event);
     };
     socket = new WebSocket(url);
