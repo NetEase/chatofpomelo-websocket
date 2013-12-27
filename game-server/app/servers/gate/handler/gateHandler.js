@@ -1,3 +1,5 @@
+var dispatcher = require('../../../util/dispatcher');
+
 module.exports = function(app) {
 	return new Handler(app);
 };
