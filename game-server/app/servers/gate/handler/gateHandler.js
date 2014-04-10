@@ -1,7 +1,15 @@
 var dispatcher = require('../../../util/dispatcher');
 
 module.exports = function(app) {
-	return new Handler(app);
+	var bearcat = app.get('bearcat');
+	return bearcat.getBean({
+		id: "gateHandler",
+		func: Handler,
+		args: [{
+			name: "app",
+			value: app
+		}]
+	});
 };
 
 var Handler = function(app) {
@@ -20,7 +28,7 @@ var handler = Handler.prototype;
  */
 handler.queryEntry = function(msg, session, next) {
 	var uid = msg.uid;
-	if(!uid) {
+	if (!uid) {
 		next(null, {
 			code: 500
 		});
@@ -28,7 +36,7 @@ handler.queryEntry = function(msg, session, next) {
 	}
 	// get all connectors
 	var connectors = this.app.getServersByType('connector');
-	if(!connectors || connectors.length === 0) {
+	if (!connectors || connectors.length === 0) {
 		next(null, {
 			code: 500
 		});

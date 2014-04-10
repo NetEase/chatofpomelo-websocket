@@ -4,6 +4,7 @@
 	"private": false,
 	"dependencies": {
 		"pomelo": "~0.9.0",
-		"crc": "0.2.0"
+		"crc": "0.2.0",
+		"bearcat": "~0.1.0"
 	}
 }

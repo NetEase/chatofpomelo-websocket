@@ -1,7 +1,15 @@
 var chatRemote = require('../remote/chatRemote');
 
 module.exports = function(app) {
-	return new Handler(app);
+	var bearcat = app.get('bearcat');
+	return bearcat.getBean({
+		id: "chatHandler",
+		func: Handler,
+		args: [{
+			name: "app",
+			value: app
+		}]
+	});
 };
 
 var Handler = function(app) {
@@ -30,7 +38,7 @@ handler.send = function(msg, session, next) {
 	channel = channelService.getChannel(rid, false);
 
 	//the target is all users
-	if(msg.target == '*') {
+	if (msg.target == '*') {
 		channel.pushMessage('onChat', param);
 	}
 	//the target is specific user
