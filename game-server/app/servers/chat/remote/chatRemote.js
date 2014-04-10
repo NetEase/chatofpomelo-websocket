@@ -8,7 +8,6 @@ module.exports = function(app) {
 			value: app
 		}]
 	});
-	// return new ChatRemote(app);
 };
 
 var ChatRemote = function(app) {
