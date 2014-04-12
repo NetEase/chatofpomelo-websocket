@@ -34,7 +34,7 @@ app.configure('production|development', function() {
 });
 
 var contextPath = require.resolve('./config/context.json');
-var bearcat = new Bearcat([contextPath]);
+var bearcat = Bearcat.createApp([contextPath]);
 
 bearcat.start(function() {
 	app.set('bearcat', bearcat);
