@@ -33,7 +33,7 @@ app.configure('production|development', function() {
 	app.filter(pomelo.timeout());
 });
 
-var contextPath = require.resolve('./config/context.json');
+var contextPath = require.resolve('./context.json');
 var bearcat = Bearcat.createApp([contextPath]);
 
 bearcat.start(function() {
