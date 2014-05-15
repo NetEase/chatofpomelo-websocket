@@ -1,7 +1,6 @@
-var chatRemote = require('../remote/chatRemote');
+var bearcat = require('bearcat');
 
 module.exports = function(app) {
-	var bearcat = app.get('bearcat');
 	return bearcat.getBean({
 		id: "chatHandler",
 		func: Handler,

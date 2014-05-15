@@ -1,19 +1,23 @@
-var dispatcher = require('../../../util/dispatcher');
+var bearcat = require('bearcat');
 
 module.exports = function(app) {
-	var bearcat = app.get('bearcat');
 	return bearcat.getBean({
 		id: "gateHandler",
 		func: Handler,
 		args: [{
 			name: "app",
 			value: app
+		}],
+		props: [{
+			name: "dispatcher",
+			ref: "dispatcher"
 		}]
 	});
 };
 
 var Handler = function(app) {
 	this.app = app;
+	this.dispatcher = null;
 };
 
 var handler = Handler.prototype;
@@ -43,7 +47,7 @@ handler.queryEntry = function(msg, session, next) {
 		return;
 	}
 	// select connector
-	var res = dispatcher.dispatch(uid, connectors);
+	var res = this.dispatcher.dispatch(uid, connectors);
 	next(null, {
 		code: 200,
 		host: res.host,

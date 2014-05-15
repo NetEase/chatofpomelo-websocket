@@ -1,5 +1,6 @@
+var bearcat = require('bearcat');
+
 module.exports = function(app) {
-	var bearcat = app.get('bearcat');
 	return bearcat.getBean({
 		id: "chatRemote",
 		func: ChatRemote,
@@ -33,7 +34,7 @@ ChatRemote.prototype.add = function(uid, sid, name, flag, cb) {
 	};
 	channel.pushMessage(param);
 
-	if ( !! channel) {
+	if (!!channel) {
 		channel.add(uid, sid);
 	}
 
@@ -52,7 +53,7 @@ ChatRemote.prototype.add = function(uid, sid, name, flag, cb) {
 ChatRemote.prototype.get = function(name, flag) {
 	var users = [];
 	var channel = this.channelService.getChannel(name, flag);
-	if ( !! channel) {
+	if (!!channel) {
 		users = channel.getMembers();
 	}
 	for (var i = 0; i < users.length; i++) {
@@ -72,7 +73,7 @@ ChatRemote.prototype.get = function(name, flag) {
 ChatRemote.prototype.kick = function(uid, sid, name, cb) {
 	var channel = this.channelService.getChannel(name, false);
 	// leave channel
-	if ( !! channel) {
+	if (!!channel) {
 		channel.leave(uid, sid);
 	}
 	var username = uid.split('*')[0];

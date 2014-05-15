@@ -1,4 +1,5 @@
 {
 	"name": "chatofpomelo-websocket-bearcat",
-	"beans": []
+	"beans": [],
+	"scan": "app"
 }
