@@ -14,14 +14,14 @@ var Configure = function() {
 			connector: pomelo.connectors.hybridconnector,
 			heartbeat: 3,
 			useDict: true,
-			useProtobuf: true
+			// useProtobuf: true
 		});
 	});
 
 	app.configure('production|development', 'gate', function() {
 		app.set('connectorConfig', {
 			connector: pomelo.connectors.hybridconnector,
-			useProtobuf: true
+			// useProtobuf: true
 		});
 	});
 
