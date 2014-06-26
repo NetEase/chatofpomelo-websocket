@@ -1,21 +1,10 @@
 var bearcat = require('bearcat');
+var pomelo = require('pomelo');
 
-module.exports = function(app) {
-	return bearcat.getBean({
-		id: "entryHandler",
-		func: Handler,
-		args: [{
-			name: "app",
-			value: app
-		}]
-	});
+var EntryHandler = function() {
+	this.$id = "entryHandler";
+	this.app = pomelo.app;
 };
-
-var Handler = function(app) {
-	this.app = app;
-};
-
-var handler = Handler.prototype;
 
 /**
  * New client entry chat server.
@@ -25,7 +14,7 @@ var handler = Handler.prototype;
  * @param  {Function} next    next stemp callback
  * @return {Void}
  */
-handler.enter = function(msg, session, next) {
+EntryHandler.prototype.enter = function(msg, session, next) {
 	var self = this;
 	var rid = msg.rid;
 	var uid = msg.username + '*' + rid
@@ -69,4 +58,8 @@ var onUserLeave = function(app, session) {
 		return;
 	}
 	app.rpc.chat.chatRemote.kick(session, session.uid, app.get('serverId'), session.get('rid'), null);
+};
+
+module.exports = function() {
+	return bearcat.getBean(EntryHandler);
 };

@@ -1,26 +1,11 @@
 var bearcat = require('bearcat');
+var pomelo = require('pomelo');
 
-module.exports = function(app) {
-	return bearcat.getBean({
-		id: "gateHandler",
-		func: Handler,
-		args: [{
-			name: "app",
-			value: app
-		}],
-		props: [{
-			name: "dispatcher",
-			ref: "dispatcher"
-		}]
-	});
+var GateHandler = function() {
+	this.$id = "gateHandler";
+	this.app = pomelo.app;
+	this.$dispatcher = null;
 };
-
-var Handler = function(app) {
-	this.app = app;
-	this.dispatcher = null;
-};
-
-var handler = Handler.prototype;
 
 /**
  * Gate handler that dispatch user to connectors.
@@ -30,7 +15,7 @@ var handler = Handler.prototype;
  * @param {Function} next next stemp callback
  *
  */
-handler.queryEntry = function(msg, session, next) {
+GateHandler.prototype.queryEntry = function(msg, session, next) {
 	var uid = msg.uid;
 	if (!uid) {
 		next(null, {
@@ -47,10 +32,14 @@ handler.queryEntry = function(msg, session, next) {
 		return;
 	}
 	// select connector
-	var res = this.dispatcher.dispatch(uid, connectors);
+	var res = this.$dispatcher.dispatch(uid, connectors);
 	next(null, {
 		code: 200,
 		host: res.host,
 		port: res.clientPort
 	});
+};
+
+module.exports = function() {
+	return bearcat.getBean(GateHandler);
 };

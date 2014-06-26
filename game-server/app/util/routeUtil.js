@@ -1,5 +1,6 @@
 var RouteUtil = function() {
-	this.dispatcher = null;
+	this.$id = "routeUtil";
+	this.$dispatcher = null;
 }
 
 RouteUtil.prototype.chat = function(session, msg, app, cb) {
@@ -10,16 +11,9 @@ RouteUtil.prototype.chat = function(session, msg, app, cb) {
 		return;
 	}
 
-	var res = this.dispatcher.dispatch(session.get('rid'), chatServers);
+	var res = this.$dispatcher.dispatch(session.get('rid'), chatServers);
 
 	cb(null, res.id);
 };
 
-module.exports = {
-	id: "routeUtil",
-	func: RouteUtil,
-	props: [{
-		name: "dispatcher",
-		ref: "dispatcher"
-	}]
-}
+module.exports = RouteUtil;

@@ -1,21 +1,10 @@
 var bearcat = require('bearcat');
+var pomelo = require('pomelo');
 
-module.exports = function(app) {
-	return bearcat.getBean({
-		id: "chatHandler",
-		func: Handler,
-		args: [{
-			name: "app",
-			value: app
-		}]
-	});
+var ChatHandler = function() {
+	this.$id = "chatHandler";
+	this.app = pomelo.app;
 };
-
-var Handler = function(app) {
-	this.app = app;
-};
-
-var handler = Handler.prototype;
 
 /**
  * Send messages to users
@@ -25,7 +14,7 @@ var handler = Handler.prototype;
  * @param  {Function} next next stemp callback
  *
  */
-handler.send = function(msg, session, next) {
+ChatHandler.prototype.send = function(msg, session, next) {
 	var rid = session.get('rid');
 	var username = session.uid.split('*')[0];
 	var channelService = this.app.get('channelService');
@@ -52,4 +41,8 @@ handler.send = function(msg, session, next) {
 	next(null, {
 		route: msg.route
 	});
+};
+
+module.exports = function() {
+	return bearcat.getBean(ChatHandler);
 };

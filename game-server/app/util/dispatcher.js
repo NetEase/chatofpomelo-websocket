@@ -1,7 +1,7 @@
 var crc = require('crc');
 
 var Dispatcher = function() {
-
+	this.$id = "dispatcher";
 }
 
 Dispatcher.prototype.dispatch = function(uid, connectors) {
@@ -9,7 +9,4 @@ Dispatcher.prototype.dispatch = function(uid, connectors) {
 	return connectors[index];
 };
 
-module.exports = {
-	id: "dispatcher",
-	func: Dispatcher
-}
+module.exports = Dispatcher;
