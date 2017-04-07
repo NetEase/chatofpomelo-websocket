@@ -27,7 +27,7 @@ handler.send = function(msg, session, next) {
 		from: username,
 		target: msg.target
 	};
-	channel = channelService.getChannel(rid, false);
+	var channel = channelService.getChannel(rid, false);
 
 	//the target is all users
 	if(msg.target == '*') {
